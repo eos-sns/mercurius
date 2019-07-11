@@ -1,9 +1,16 @@
 # !/usr/bin/python3
 # coding: utf-8
 
+from flask import jsonify
 
-""" Handle server requests """
+from mercurius.req.core import XMLHttpRequest
 
 
 def handle_request(req):
-    print('handling req', req)
+    xhr = XMLHttpRequest(req)
+    print('handling req', xhr)
+
+    response = jsonify(
+        status="wow"
+    )
+    return response

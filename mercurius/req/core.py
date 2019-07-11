@@ -15,7 +15,9 @@ class XMLHttpRequest:
         """
 
         self.data = req.data
-        self.input_file, self.error_file = None, None
         self.form = req.form
-        self.meta_data = None
-        self.upload_folder = None
+
+    def __str__(self):
+        out = "*** data: {}\n".format(self.data)
+        out += "*** form: {}\n".format(self.form)
+        return out

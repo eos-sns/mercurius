@@ -11,7 +11,8 @@ app = Flask(APP_NAME)
 
 @app.route("/", methods=["POST"])
 def index():
-    return handle_request(request)
+    response = handle_request(request)
+    return response
 
 
 if __name__ == "__main__":
