@@ -9,6 +9,7 @@ from helios.config.configuration import EosConfiguration
 from helios.helios.core import Helios
 from helios.helios.h5 import MongoH5Collection
 
+from emails.mailer import notify_user_of_good_request, notify_user_of_download
 from mercurius.req.core import XMLHttpRequest
 
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -62,14 +63,6 @@ def convert_user_files(files):
     return out
 
 
-def notify_of_download(user, download_link):
-    pass  # todo send email
-
-
-def notify_of_eta(user, eta):
-    pass  # todo send email
-
-
 def handle_db_results(helios, results):
     results = results.get()
 
@@ -92,11 +85,17 @@ def handle_query(user, params, files_requested):
     files_to_get = convert_user_files(files_requested)  # todo filter for files requested
     results = query.execute()
     download_link = handle_db_results(helios, results)
-    notify_of_download(user, download_link)
+    download_info = {
+        'timeout': 'in 14 days',
+        'link': download_link
+    }
+    notify_user_of_download(user['email'], user['name'], download_info)
 
 
 def estimate_query_time(user, params, files_requested):
-    pass  # todo send email with ETA
+    return {
+        'long time': 'in a few hours'
+    }
 
 
 def handle_request(req):
@@ -104,12 +103,13 @@ def handle_request(req):
     is_ok = xhr.get_status()
 
     if is_ok:
+        user = xhr.get_user()
         try:
             pool = ThreadPool(processes=1)
 
             res = pool.apply_async(estimate_query_time, (xhr.get_user(), xhr.get_params(), xhr.get_files()))  # thread
             eta = res.get()  # wait until thread returns
-            notify_of_eta(xhr.get_user(), eta)
+            notify_user_of_good_request(user['email'], user['name'], eta)
 
             pool.apply_async(handle_query(xhr.get_user(), xhr.get_params(), xhr.get_files()))  # thread
 
