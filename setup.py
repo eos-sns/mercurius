@@ -30,7 +30,8 @@ setup(
     include_package_data=True,
     install_requires=[
         "werkzeug",
-        "flask"
+        "flask",
+        "helios"
     ],
     entry_points={
         "console_scripts": ["mercurius = mercurius.server:cli"]
