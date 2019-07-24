@@ -31,7 +31,7 @@ setup(
     install_requires=[
         "werkzeug",
         "flask",
-        "helios"
+        "helios", 'httplib2', 'google-api-python-client'
     ],
     entry_points={
         "console_scripts": ["mercurius = mercurius.server:cli"]
