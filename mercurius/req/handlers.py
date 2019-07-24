@@ -13,9 +13,10 @@ from emails.mailer import notify_user_of_good_request, notify_user_of_download
 from mercurius.req.core import XMLHttpRequest
 
 HERE = os.path.abspath(os.path.dirname(__file__))
-ROOT_FOLDER = os.path.join(os.path.dirname(HERE))
-DEFAULT_CONFIG_FOLDER = os.path.join(HERE, 'config')
-MERCURIUS_CONFIGURATION = EosConfiguration(DEFAULT_CONFIG_FOLDER)
+ROOT_FOLDER = os.path.join(os.path.dirname(os.path.dirname(HERE)))
+DEFAULT_CONFIG_FOLDER = os.path.join(ROOT_FOLDER, 'config')
+DEFAULT_CONFIG_FILE = os.path.join(DEFAULT_CONFIG_FOLDER, 'config.json')
+MERCURIUS_CONFIGURATION = EosConfiguration(DEFAULT_CONFIG_FILE)
 USER_PARAMS2MONGO = {
     'alphaEsc': 'ALPHA_ESC',
     'alphaStar': 'ALPHA_STAR',
@@ -31,25 +32,27 @@ USER_FILES2MONGO = {
     0: 'co-eval_k',
     1: 'co-eval_PS_z'
 }
-GOOD_REQ = jsonify(
-    status='Done',
-    code=200
-)
-GOOD_INPUT_BAD_HANDLE_REQ = jsonify(
-    status='Cannot handle request!',
-    code=800
-)
-BAD_REQ = jsonify(
-    status='Cannot parse request',
-    code=300
-)
+GOOD_REQ = {
+    'status': 'Done!',
+    'code': '200'
+}
+GOOD_INPUT_BAD_HANDLE_REQ = {
+    'status': 'Cannot handle request!',
+    'code': '800'
+}
+BAD_REQ = {
+    'status': 'Cannot parse request!',
+    'code': '300'
+}
 
 
 def convert_user_dict(d):
     out = {}
+
     for key, val in d.items():
         new_key = USER_PARAMS2MONGO[key]
         out[new_key] = val
+
     return out
 
 
@@ -92,7 +95,8 @@ def handle_query(user, params, files_requested):
     notify_user_of_download(user['email'], user['name'], download_info)
 
 
-def estimate_query_time(user, params, files_requested):
+def estimate_query_time(params, files_requested):
+    # todo estimate time based on how big are the ranges of each param in params
     return {
         'long time': 'in a few hours'
     }
@@ -103,19 +107,19 @@ def handle_request(req):
     is_ok = xhr.get_status()
 
     if is_ok:
-        user = xhr.get_user()
+        user, params, files = xhr.get_user(), xhr.get_params(), xhr.get_files()
+
         try:
             pool = ThreadPool(processes=1)
 
-            res = pool.apply_async(estimate_query_time, (xhr.get_user(), xhr.get_params(), xhr.get_files()))  # thread
+            res = pool.apply_async(estimate_query_time, (params, files))  # thread
             eta = res.get()  # wait until thread returns
             notify_user_of_good_request(user['email'], user['name'], eta)
 
             pool.apply_async(handle_query(xhr.get_user(), xhr.get_params(), xhr.get_files()))  # thread
 
-            return GOOD_REQ
+            return jsonify(**GOOD_REQ)
         except Exception as e:
-            # todo log
-            return GOOD_INPUT_BAD_HANDLE_REQ
+            return jsonify(**GOOD_INPUT_BAD_HANDLE_REQ)
 
-    return BAD_REQ
+    return jsonify(**BAD_REQ)

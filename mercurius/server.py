@@ -11,11 +11,9 @@ app = Flask(APP_NAME)
 
 @app.route("/", methods=["POST"])
 def index():
-    response = handle_request(request)
-    return response
+    return handle_request(request)
 
 
 if __name__ == "__main__":
     app.debug = True
-
     app.run(host=APP_HOST, port=APP_PORT, debug=True, threaded=True)

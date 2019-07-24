@@ -4,6 +4,8 @@
 
 """ Models and data structure """
 
+import json
+
 
 class XMLHttpRequest:
     """ Parse XMLHttpRequest """
@@ -14,8 +16,8 @@ class XMLHttpRequest:
             Client request
         """
 
-        self.data = req.data
-        self.form = req.form
+        self.data = json.loads(req.data)
+        self.form = req.form.to_dict(flat=False)
 
     def get_params(self):
         return self.data['params']
@@ -27,8 +29,8 @@ class XMLHttpRequest:
         return self.data['user']
 
     def __str__(self):
-        out = "*** data: {}\n".format(self.data)
-        out += "*** form: {}\n".format(self.form)
+        out = "- Data: {}\n".format(self.data)
+        out += "- Form: {}\n".format(self.form)
         return out
 
     def get_status(self):

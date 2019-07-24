@@ -98,7 +98,7 @@ def notify_user_of_good_input_bad_handle(recipient, name_surname):
 
 def notify_user_of_good_request(recipient, name_surname, eta):
     eta_time = eta['long time']
-    msg = "EOS has parsed correctly your request. It will be processed.<br>" \
+    msg = "EOS has parsed correctly your request. It will be processed {}.<br>" \
           "You will receive another email with the link to download the " \
           "output.".format(eta_time)
     notify_user(msg, recipient, name_surname, "EOS | start")
