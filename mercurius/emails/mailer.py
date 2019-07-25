@@ -79,7 +79,7 @@ def notify_user(raw_message, recipient, name_surname, subject):
     raw_message = "Dear {},<br><br>".format(name_surname) + raw_message
     raw_message += "<br><br>Best regards,<br><br>EOS developers"
     msg = get_msg(recipient, raw_message, subject)
-    send_msg(msg)
+    # todo send_msg(msg)
 
 
 def notify_user_of_bad_handle(recipient, name_surname):

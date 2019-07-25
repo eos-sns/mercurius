@@ -67,11 +67,9 @@ def convert_user_files(files):
 
 
 def handle_db_results(helios, results):
-    results = results.get()
-
     if results:
-        h5s = MongoH5Collection(results)
-        output_path = h5s.save_to_disk()
+        h5s = MongoH5Collection(results, helios.config.get_tmp())
+        output_path = h5s.save_to_disk(helios.config.get_output()["folder"])
         download_link = helios.get_download_link(output_path)
         return download_link
 
@@ -87,7 +85,7 @@ def handle_query(user, params, files_requested):
 
     files_to_get = convert_user_files(files_requested)  # todo filter for files requested
     results = query.execute()
-    download_link = handle_db_results(helios, results)
+    download_link = handle_db_results(helios, results.get())
     download_info = {
         'timeout': 'in 14 days',
         'link': download_link
