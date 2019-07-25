@@ -1,6 +1,7 @@
 from helios.config.configuration import EosConfiguration
 from helios.helios.core import Helios
 from helios.helios.h5 import MongoH5Collection
+from helios.logs.logger import Logger
 
 MERCURIUS_CONFIGURATION = EosConfiguration('/home/stefano/Work/sns/eos/mercurius/config/config.json')
 
@@ -105,7 +106,9 @@ def woow():
         "path": "/home/stefano/Work/sns/eos/hyperion/_tmp/data_0.h5"
     }]
     download_link = handle_db_results(helios, results)
-    print(download_link)
+
+    logger = Logger('woow')
+    logger.log_message('download at {}'.format(download_link))
 
 
 if __name__ == "__main__":
