@@ -10,7 +10,7 @@ from email.mime.text import MIMEText
 
 from mercurius.emails.gmail import GMailApiOAuth, send_email
 
-HERE = os.path.dirname(os.path.realpath(__file__))
+HERE = '/opt/eos/mercurius/mercurius/emails'
 OAUTH_FOLDER = os.path.join(HERE, ".user_credentials", "gmail")
 CONFIG_FOLDER = os.path.join(HERE, "config")
 

@@ -13,7 +13,7 @@ from mercurius.emails.mailer import notify_user_of_good_request, notify_user_of_
 from mercurius.req.core import XMLHttpRequest
 
 HERE = os.path.abspath(os.path.dirname(__file__))
-ROOT_FOLDER = os.path.join(os.path.dirname(os.path.dirname(HERE)))
+ROOT_FOLDER = '/opt/eos/mercurius'
 DEFAULT_CONFIG_FOLDER = os.path.join(ROOT_FOLDER, 'config')
 DEFAULT_CONFIG_FILE = os.path.join(DEFAULT_CONFIG_FOLDER, 'config.json')
 MERCURIUS_CONFIGURATION = EosConfiguration(DEFAULT_CONFIG_FILE)
@@ -79,10 +79,7 @@ def handle_db_results(helios, results):
 def handle_query(user, params, files_requested):
     helios = Helios(MERCURIUS_CONFIGURATION)
     params = convert_user_dict(params)
-    query = helios.builder() \
-        .from_dict(params) \
-        .build()
-
+    query = helios.builder().from_dict({'ALPHA_ESC': [-0.5]}).build()
     files_to_get = convert_user_files(files_requested)  # todo filter for files requested
     results = query.execute()
     download_link = handle_db_results(helios, results.get())
@@ -114,7 +111,7 @@ def handle_request(req):
             res = pool.apply_async(estimate_query_time, (params, files))  # thread
             eta = res.get()  # wait until thread returns
             notify_user_of_good_request(user['email'], user['name'], eta)
-
+            print('notified')
             pool.apply_async(handle_query(xhr.get_user(), xhr.get_params(), xhr.get_files()))  # thread
 
             return jsonify(**GOOD_REQ)
