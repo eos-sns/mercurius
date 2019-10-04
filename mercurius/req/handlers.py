@@ -66,10 +66,10 @@ def convert_user_files(files):
     return out
 
 
-def handle_db_results(helios, results):
+def handle_db_results(helios, results, files_to_get):
     if results:
         h5s = MongoH5Collection(results, helios.config.get_tmp())
-        output_path = h5s.save_to_disk(helios.config.get_output()["folder"])
+        output_path = h5s.save_to_disk(helios.config.get_output()["folder"], files_to_get)
         download_link = helios.get_download_link(output_path)
         return download_link
 
@@ -79,10 +79,10 @@ def handle_db_results(helios, results):
 def handle_query(user, params, files_requested):
     helios = Helios(MERCURIUS_CONFIGURATION)
     params = convert_user_dict(params)
-    query = helios.builder().from_dict({'ALPHA_ESC': [-0.5]}).build()
-    files_to_get = convert_user_files(files_requested)  # todo filter for files requested
+    query = helios.builder().from_dict(params).build()
+    files_to_get = convert_user_files(files_requested)
     results = query.execute()
-    download_link = handle_db_results(helios, results.get())
+    download_link = handle_db_results(helios, results.get(), files_to_get)
     download_info = {
         'timeout': 'in 14 days',
         'link': download_link
@@ -111,11 +111,10 @@ def handle_request(req):
             res = pool.apply_async(estimate_query_time, (params, files))  # thread
             eta = res.get()  # wait until thread returns
             notify_user_of_good_request(user['email'], user['name'], eta)
-            print('notified')
             pool.apply_async(handle_query(xhr.get_user(), xhr.get_params(), xhr.get_files()))  # thread
 
             return jsonify(**GOOD_REQ)
-        except Exception as e:
+        except Exception:
             return jsonify(**GOOD_INPUT_BAD_HANDLE_REQ)
 
     return jsonify(**BAD_REQ)
