@@ -6,7 +6,7 @@
 
 import base64
 import os
-from email.mime.text import MIMEText
+from mercurius.email.mime.text import MIMEText
 
 from mercurius.emails.gmail import GMailApiOAuth, send_email
 
@@ -79,7 +79,7 @@ def notify_user(raw_message, recipient, name_surname, subject):
     raw_message = "Dear {},<br><br>".format(name_surname) + raw_message
     raw_message += "<br><br>Best regards,<br><br>EOS developers"
     msg = get_msg(recipient, raw_message, subject)
-    # todo send_msg(msg)
+    send_msg(msg)
 
 
 def notify_user_of_bad_handle(recipient, name_surname):

@@ -9,7 +9,7 @@ from helios.config.configuration import EosConfiguration
 from helios.helios.core import Helios
 from helios.helios.h5 import MongoH5Collection
 
-from emails.mailer import notify_user_of_good_request, notify_user_of_download
+from mercurius.emails.mailer import notify_user_of_good_request, notify_user_of_download
 from mercurius.req.core import XMLHttpRequest
 
 HERE = os.path.abspath(os.path.dirname(__file__))
