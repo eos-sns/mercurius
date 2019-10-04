@@ -100,6 +100,7 @@ def estimate_query_time(params, files_requested):
     }
 
 
+# todo decorator to handle exception, input error
 def handle_request(req):
     xhr = XMLHttpRequest(req)
     is_ok = xhr.get_status()
