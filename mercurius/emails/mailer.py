@@ -6,7 +6,7 @@
 
 import base64
 import os
-from mercurius.email.mime.text import MIMEText
+from email.mime.text import MIMEText
 
 from mercurius.emails.gmail import GMailApiOAuth, send_email
 

@@ -80,7 +80,7 @@ def handle_query(user, params, files_requested):
     helios = Helios(MERCURIUS_CONFIGURATION)
     params = convert_user_dict(params)
     query = helios.builder() \
-        .from_dict(params) \
+        .from_dict({'ALPHA_ESC': [-0.5]}) \
         .build()
 
     files_to_get = convert_user_files(files_requested)  # todo filter for files requested
