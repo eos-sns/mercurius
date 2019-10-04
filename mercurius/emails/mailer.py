@@ -108,6 +108,10 @@ def notify_user_of_download(recipient, name_surname, download_info):
     download_link = download_info['link']
     download_timeout = download_info['timeout']
 
-    msg = "EOS has finished fetching the data. Here is the <a href='{}'>download link</a> to download the data.<br>" \
-          "Be warned that the files will be deleted {}.".format(download_link, download_timeout)
+    if download_link:
+        msg = "EOS has finished fetching the data. Here is the <a href='{}'>download link</a> to download the data.<br>" \
+              "Be warned that the files will be deleted {}.".format(download_link, download_timeout)
+    else:
+        msg = "EOS has finished fetching the data, but found any documents matching your query."
+
     notify_user(msg, recipient, name_surname, "EOS | download")
