@@ -10,7 +10,7 @@ from helios.helios.core import Helios
 from helios.helios.h5 import MongoH5Collection
 
 from mercurius.emails.mailer import notify_user_of_good_request, notify_user_of_download
-from mercurius.req.core import XMLHttpRequest
+from mercurius.req.core import PostRequest, PutRequest
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 ROOT_FOLDER = '/opt/eos/mercurius'
@@ -44,6 +44,8 @@ BAD_REQ = {
     'status': 'Cannot parse request!',
     'code': '300'
 }
+AVERAGE_FILE_SIZE_MB = 5
+AVERAGE_COMPRESSION_RATIO = 0.25
 
 
 def convert_user_dict(d):
@@ -91,18 +93,28 @@ def handle_query(user, params, files_requested):
 
 
 def estimate_query_time(params, files_requested):
-    # todo estimate time based on how big are the ranges of each param in params
+    helios = Helios(MERCURIUS_CONFIGURATION)
+    params = convert_user_dict(params)
+    query = helios.builder().from_dict(params).build()
+    n_files = len(convert_user_files(files_requested))
+    n_results = query.count()
+    tot_size = n_results * n_files * AVERAGE_FILE_SIZE_MB
+    compressed_size = tot_size * AVERAGE_COMPRESSION_RATIO
+
     return {
-        'long time': 'in a few hours'
+        'nSimulations': n_results,
+        'mbSize': compressed_size,
     }
 
 
-# todo decorator to handle exception, input error
-def handle_request(req):
-    xhr = XMLHttpRequest(req)
-    is_ok = xhr.get_status()
+def return_bad_request(req):
+    return jsonify(**BAD_REQ)
 
-    if is_ok:
+
+# todo decorator to handle exception, input error
+def handle_post_request(req):
+    xhr = PostRequest(req)
+    if xhr.is_ok():
         user, params, files = xhr.get_user(), xhr.get_params(), xhr.get_files()
 
         try:
@@ -115,6 +127,22 @@ def handle_request(req):
 
             return jsonify(**GOOD_REQ)
         except Exception:
+            return jsonify(**GOOD_INPUT_BAD_HANDLE_REQ)
+
+    return jsonify(**BAD_REQ)
+
+
+def handle_put_request(req):
+    xhr = PutRequest(req)
+    if xhr.is_ok():
+        params, files = xhr.get_params(), xhr.get_files()
+
+        try:
+            result = estimate_query_time(params, files)
+            return jsonify(**result)
+        except Exception:
+            import traceback
+            traceback.print_exc()
             return jsonify(**GOOD_INPUT_BAD_HANDLE_REQ)
 
     return jsonify(**BAD_REQ)
