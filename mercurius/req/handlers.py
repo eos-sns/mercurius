@@ -2,6 +2,7 @@
 # coding: utf-8
 
 import os
+import traceback  # todo debug only
 from multiprocessing.pool import ThreadPool
 
 from flask import jsonify
@@ -100,7 +101,6 @@ def estimate_query_time(params, files_requested):
     n_results = query.count()
     tot_size = n_results * n_files * AVERAGE_FILE_SIZE_MB
     compressed_size = tot_size * AVERAGE_COMPRESSION_RATIO
-
     return {
         'nSimulations': n_results,
         'mbSize': compressed_size,
@@ -127,6 +127,7 @@ def handle_post_request(req):
 
             return jsonify(**GOOD_REQ)
         except Exception:
+            traceback.print_exc()  # todo debug only
             return jsonify(**GOOD_INPUT_BAD_HANDLE_REQ)
 
     return jsonify(**BAD_REQ)
@@ -141,8 +142,7 @@ def handle_put_request(req):
             result = estimate_query_time(params, files)
             return jsonify(**result)
         except Exception:
-            import traceback
-            traceback.print_exc()
+            traceback.print_exc()  # todo debug only
             return jsonify(**GOOD_INPUT_BAD_HANDLE_REQ)
 
     return jsonify(**BAD_REQ)
