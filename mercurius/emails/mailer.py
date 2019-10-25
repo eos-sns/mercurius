@@ -4,24 +4,27 @@
 
 """ Send emails """
 
-import base64
 import os
 from email.mime.text import MIMEText
 
-from mercurius.emails.gmail import GMailApiOAuth, send_email
+from helios.config.configuration import JsonConfiguration
 
-HERE = '/opt/eos/mercurius/mercurius/emails'
-OAUTH_FOLDER = os.path.join(HERE, ".user_credentials", "gmail")
-CONFIG_FOLDER = os.path.join(HERE, "config")
+from mercurius.emails.gmail import auth_smtp, send_email
+
+ROOT_FOLDER = '/opt/eos/mercurius/'
+CONFIG_FOLDER = os.path.join(ROOT_FOLDER, "config")
+CONFIG_FILE = os.path.join(CONFIG_FOLDER, "config.json")
+CONFIG = JsonConfiguration(CONFIG_FILE)
 
 # email settings
-EMAIL_DRIVER = GMailApiOAuth(
-    "EOS",
-    os.path.join(OAUTH_FOLDER, "client_secret.json"),
-    os.path.join(OAUTH_FOLDER, "gmail.json")
-).create_driver()
 EMAIL_SENDER = "eos.cosmosns@gmail.com"
-ADMIN_CONFIG_FILE = os.path.join(CONFIG_FOLDER, 'admins.json')
+EMAIL_CONFIG = CONFIG.get_config('email')
+EMAIL_SERVER = auth_smtp(
+    EMAIL_CONFIG['user'],
+    EMAIL_CONFIG['pass'],
+    EMAIL_CONFIG['server'],
+    EMAIL_CONFIG['port']
+)
 HELP_EMAILS = [
     {
         "name": "Andrei Albert Mesinger",
@@ -46,40 +49,23 @@ def get_msg(recipient, html_content, subject):
     message["subject"] = subject
     message["to"] = str(recipient).strip()
 
-    return {
-        "raw": base64.urlsafe_b64encode(bytes(message)).decode()
-    }
+    return message
 
 
-def send_msg(msg):
-    """
-    :param msg: str
-        Message to send to me
-    :return: void
-        Sends email to me with this message
-    """
-
+def send_msg(recipient, msg):
     send_email(
         EMAIL_SENDER,
+        recipient,
         msg,
-        EMAIL_DRIVER
+        EMAIL_SERVER
     )
 
 
 def notify_user(raw_message, recipient, name_surname, subject):
-    """
-    :param raw_message: str
-        HTML message
-    :param recipient: str
-        Email of recipient
-    :return: bool
-        True iff successful notification
-    """
-
     raw_message = "Dear {},<br><br>".format(name_surname) + raw_message
     raw_message += "<br><br>Best regards,<br><br>EOS developers"
     msg = get_msg(recipient, raw_message, subject)
-    send_msg(msg)
+    send_msg(recipient, msg)
 
 
 def notify_user_of_bad_handle(recipient, name_surname):
