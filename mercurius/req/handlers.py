@@ -123,7 +123,7 @@ def handle_post_request(req):
             res = pool.apply_async(estimate_query_time, (params, files))  # thread
             eta = res.get()  # wait until thread returns
             notify_user_of_good_request(user['email'], user['name'], eta)
-            pool.apply_async(handle_query(xhr.get_user(), xhr.get_params(), xhr.get_files()))  # thread
+            pool.apply_async(handle_query(user, params, files))  # thread
 
             return jsonify(**GOOD_REQ)
         except Exception:
