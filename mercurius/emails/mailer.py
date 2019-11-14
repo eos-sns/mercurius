@@ -11,7 +11,7 @@ from helios.config.configuration import JsonConfiguration
 
 from mercurius.emails.gmail import auth_smtp, send_email
 
-ROOT_FOLDER = '/opt/eos/mercurius/'
+ROOT_FOLDER = os.getenv('MERCURIUS_FOLDER')
 CONFIG_FOLDER = os.path.join(ROOT_FOLDER, "config")
 CONFIG_FILE = os.path.join(CONFIG_FOLDER, "config.json")
 CONFIG = JsonConfiguration(CONFIG_FILE)

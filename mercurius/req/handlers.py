@@ -13,8 +13,7 @@ from helios.helios.h5 import MongoH5Collection
 from mercurius.emails.mailer import notify_user_of_good_request, notify_user_of_download
 from mercurius.req.core import PostRequest, PutRequest
 
-HERE = os.path.abspath(os.path.dirname(__file__))
-ROOT_FOLDER = '/opt/eos/mercurius'
+ROOT_FOLDER = os.getenv('MERCURIUS_FOLDER')
 DEFAULT_CONFIG_FOLDER = os.path.join(ROOT_FOLDER, 'config')
 DEFAULT_CONFIG_FILE = os.path.join(DEFAULT_CONFIG_FOLDER, 'config.json')
 MERCURIUS_CONFIGURATION = EosConfiguration(DEFAULT_CONFIG_FILE)
@@ -30,8 +29,13 @@ USER_PARAMS2MONGO = {
     'xRaySpecIndex': 'X_RAY_SPEC_INDEX'
 }  # convert frontend params 2 mongodb keys
 USER_FILES2MONGO = {
-    0: 'co-eval_k',
-    1: 'co-eval_PS_z'
+    0: ['21cm_lightcone', '21cm_lightcone_z'],  # lightcone
+    1: ['density_lightcone', '21cm_lightcone_z'],  # density lightcone
+    2: ['LF_UV_z', 'M_UV_z', 'M_h_z'],  # luminosity function
+    3: ['Tb_global', 'redshifts_global'],  # global signal
+    4: ['neutral_fraction_global', 'redshifts_global'],  # neutral fraction global
+    5: ['co-eval_PS_z', 'cp-eval_k', 'co-eval_PS_error_z'],  # co-eval PS
+    6: ['lightcone_PS_z', 'lightcone_k', 'lightcone_PS_error_z']  # lightcone PS
 }
 GOOD_REQ = {
     'status': 'Done!',
@@ -64,7 +68,9 @@ def convert_user_files(files):
 
     for i, boolean in enumerate(files):
         if boolean:
-            out.append(USER_FILES2MONGO[i])
+            out += USER_FILES2MONGO[i]
+
+    out = list(set(out))  # some fields may be in more than 1 key
 
     return out
 
@@ -107,7 +113,7 @@ def estimate_query_time(params, files_requested):
     }
 
 
-def return_bad_request(req):
+def return_bad_request(_):
     return jsonify(**BAD_REQ)
 
 
