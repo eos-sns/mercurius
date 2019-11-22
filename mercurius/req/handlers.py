@@ -34,8 +34,11 @@ USER_FILES2MONGO = {
     2: ['LF_UV_z', 'M_UV_z', 'M_h_z'],  # luminosity function
     3: ['Tb_global', 'redshifts_global'],  # global signal
     4: ['neutral_fraction_global', 'redshifts_global'],  # neutral fraction global
-    5: ['co-eval_PS_z', 'cp-eval_k', 'co-eval_PS_error_z'],  # co-eval PS
-    6: ['lightcone_PS_z', 'lightcone_k', 'lightcone_PS_error_z']  # lightcone PS
+    5: ['co-eval_PS_z', 'co-eval_k', 'co-eval_PS_error_z'],  # co-eval PS
+    6: ['lightcone_PS_z', 'lightcone_k', 'lightcone_PS_error_z'],  # lightcone PS
+    7: ['21cm_lightcone', '21cm_lightcone_z', 'LF_UV_z', 'M_UV_z', 'M_h_z', 'Tb_global', 'co-eval_PS_error_z',
+        'co-eval_PS_z', 'co-eval_k', 'density_lightcone', 'lightcone_PS_error_z', 'lightcone_PS_z', 'lightcone_k',
+        'neutral_fraction_global', 'redshifts_global']  # all
 }
 GOOD_REQ = {
     'status': 'Done!',

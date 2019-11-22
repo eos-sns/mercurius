@@ -6,6 +6,7 @@
 
 import abc
 import json
+from abc import ABC
 
 
 class HttpRequest:
@@ -44,13 +45,15 @@ class HttpRequest:
         return False
 
 
-class PostRequest(HttpRequest):
+class EosRequest(HttpRequest, ABC):
     def get_params(self):
         return self.data['params']
 
     def get_files(self):
         return self.data['files']
 
+
+class PostRequest(EosRequest):
     def get_user(self):
         return self.data['user']
 
@@ -58,12 +61,6 @@ class PostRequest(HttpRequest):
         return self.check_keys(['params', 'files', 'user'])
 
 
-class PutRequest(HttpRequest):
-    def get_params(self):
-        return self.data['params']
-
-    def get_files(self):
-        return self.data['files']
-
+class PutRequest(EosRequest):
     def is_ok(self):
         return self.check_keys(['params', 'files'])
